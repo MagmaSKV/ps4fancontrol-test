@@ -29,7 +29,7 @@ After once executed with root privileges, you can run it using
 ps4fancontrol
 ```
 
-# It is not necessary to put it at startup (at least in my case) since it saves it and even in OrbisOS (PS4) the fan works the same as in Linux
+### It is not necessary to put it at startup (at least in my case) since it saves it and even in OrbisOS (PS4) the fan works the same as in Linux
 
 Select your favorite threshold temperature, save and exit.
 The selected temperature will be saved in a config file and loaded when ps4fancontrol starts.
