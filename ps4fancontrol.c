@@ -156,7 +156,7 @@ void showError(const char *title, const char *str)
 	exit(-1);
 }
 
-int make_config_world_writable(const char *file)
+void make_config_world_writable(const char *file)
 {
     // 0666 = lectura/escritura para todos
     if (chmod(file, 0666) != 0) {
