@@ -1,0 +1,8 @@
+[Unit]
+Description=Adjust threshold temperature
+
+[Service]
+ExecStart=/sbin/ps4fancontrol --no-gui
+
+[Install]
+WantedBy=multi-user.target
