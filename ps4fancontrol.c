@@ -414,8 +414,8 @@ int main(int argc, char *argv[])
 	}
 	close(fd);
 	
-	int uid = getuid();
-	int gid = getgid();
+	uid = getuid();
+	gid = getgid();
 	printf("Running as uid=%d, gid=%d\n", uid, gid);
 	
 	get_temp_threshold(&curTemp);
