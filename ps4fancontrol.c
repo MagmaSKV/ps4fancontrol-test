@@ -19,7 +19,7 @@ FL_OBJECT *cnt, *bReset, *bSave, *bExit;
 uint8_t curTemp = 0x4f;
 uint8_t prevTemp = 0;
 
-char *configFile;
+const char *configFile = "/var/lib/ps4fancontrol/threshold_temp";
 
 int debug = -1;
 
@@ -39,7 +39,6 @@ struct icc_cmd {
 
 #define CONFIG_DIR "/var/lib/ps4fancontrol"
 #define CONFIG_FILE GLOBAL_CONFIG_FILE
-const char *configFile = "/var/lib/ps4fancontrol/threshold_temp";
 
 int file_exist(const char *filename)
 {	
