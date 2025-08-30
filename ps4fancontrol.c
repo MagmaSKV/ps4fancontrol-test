@@ -37,22 +37,9 @@ struct icc_cmd {
 
 #define ICC_IOCTL_CMD _IOWR(ICC_MAJOR, 1, struct icc_cmd)
 
-int getUserGroupId(int *uid, int *gid)
-{
-    struct passwd *pw;
-
-    pw = getpwuid(getuid());
-    if (pw == NULL) {
-        perror("getpwuid");
-        return -1;
-    }
-
-    *uid = pw->pw_uid;
-    *gid = pw->pw_gid;
-
-    printf("uid: %d, gid: %d\n", *uid, *gid);
-    return 0;
-}
+#define CONFIG_DIR "/var/lib/ps4fancontrol"
+#define CONFIG_FILE GLOBAL_CONFIG_FILE
+const char *configFile = "/var/lib/ps4fancontrol/threshold_temp";
 
 int file_exist(const char *filename)
 {	
@@ -66,60 +53,29 @@ int file_exist(const char *filename)
 
 int initSettings()
 {
-	char *configDir;
-	char *tmp_buffer;
-	const char *homeDir;
-	struct passwd *pwd;
-	
-	pwd = getpwuid(getuid());
-	homeDir = pwd->pw_dir;
-		
-	printf("Home directory is %s\n", homeDir);
-		
-	tmp_buffer = malloc(strlen(homeDir) + 10);
-	sprintf(tmp_buffer, "%s/.config", homeDir);
-	
-	printf("Config directory is %s\n", tmp_buffer);
-	
-	DIR *dir = opendir(tmp_buffer);
+	DIR *dir = opendir(CONFIG_DIR);
 	if(dir == NULL)
 	{
-		printf("Directory %s not found\n",tmp_buffer );
 		if(errno == ENOENT)
 		{
-			printf("Create directory %s\n", tmp_buffer);
-			if(mkdir(tmp_buffer, 0700))
+			printf("Directory %s not found, creating it...\n", CONFIG_DIR);
+			if(mkdir(CONFIG_DIR, 0755))
 			{
-				perror("Error");
+				perror("Error creating config directory");
 				return -1;
 			}
 		}
-	}
-	closedir(dir);
-	
-	configDir = malloc(strlen(tmp_buffer) + 16);
-	sprintf(configDir, "%s/Ps4FanControl", tmp_buffer);
-	
-	dir = opendir(configDir);
-	if(dir == NULL)
-	{
-		printf("Directory %s not found\n", configDir);
-		if(errno == ENOENT)
+		else
 		{
-			printf("Create directory %s\n", configDir);
-			if(mkdir(configDir, 0755))
-			{
-				perror("Error");
-				return -1;
-			}
+			perror("Error opening config directory");
+			return -1;
 		}
 	}
-	closedir(dir);
-	
-	configFile = malloc(strlen(configDir) + 16);
-	sprintf(configFile, "%s/threshold_temp", configDir);
-	free(configDir);
-	
+	else
+	{
+		closedir(dir);
+	}
+
 	return 0;
 }
 
@@ -128,7 +84,7 @@ int saveConfig(uint8_t temperature)
 	FILE *f = fopen(configFile, "wb");
 	if(f == NULL)
 	{
-		perror("Error");
+		perror("Error opening config file for writing");
 		return -1;
 	}
 	if(fwrite(&temperature, 1, 1, f) != 1)
@@ -140,27 +96,22 @@ int saveConfig(uint8_t temperature)
 	}
 	
 	printf("Selected threshold temperature saved in %s\n", configFile);
-	
 	fclose(f);
-	
 	return 0;
 }
 
 int loadConfig()
 {
-	FILE *f;
-	uint8_t ret;
-	uint8_t temp_bak = curTemp;
-	
-	f = fopen(configFile, "rb");
+	FILE *f = fopen(configFile, "rb");
 	if(f == NULL)
 	{
 		printf("Configuration file not found\n");
 		return -1;
 	}
-	
-	fseek(f, 0, SEEK_CUR);
-	
+
+	uint8_t ret;
+	uint8_t temp_bak = curTemp;
+
 	if(fread(&ret, 1, 1, f) != 1)
 	{
 		printf("Error reading configuration file\n");
@@ -168,18 +119,15 @@ int loadConfig()
 		fclose(f);
 		return -1;
 	}
-	
-	printf("ret value: %d\n", ret);
-	
+
 	if(ret >= 45 && ret <= 85)
 		curTemp = ret;
 	else
-		printf("Configuration file contain a invalid value\n");
-	
+		printf("Configuration file contains an invalid value\n");
+
 	printf("Threshold temperature loaded from configuration file\n");
-	
 	fclose(f);
-	
+
 	return 0;
 }
 
@@ -467,21 +415,9 @@ int main(int argc, char *argv[])
 	}
 	close(fd);
 	
-	//drop root priviliges
-	if(getUserGroupId(&uid, &gid))
-	{
-		printf("Uid and gid not found, can't drop privileges\n");
-		return -1;
-	}
-	
-	setgid(gid);
-	setuid(uid);
-	
-	if(setuid(0) == 0)
-	{
-		printf("Error: we still root, this is bad\n");
-		return -1;
-	}
+	int uid = getuid();
+	int gid = getgid();
+	printf("Running as uid=%d, gid=%d\n", uid, gid);
 	
 	get_temp_threshold(&curTemp);
 	
