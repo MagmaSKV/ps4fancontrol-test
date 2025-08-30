@@ -149,21 +149,23 @@ int loadConfig()
 
 void showError(const char *title, const char *str)
 {
-	FL_FORM *f;
-	FL_OBJECT *obj;
-	
-	f = fl_bgn_form(FL_UP_BOX, 300, 130);
-	fl_add_box(FL_NO_BOX, 0, 0, 300, 90, str);
-	obj = fl_add_button(FL_NORMAL_BUTTON, 115, 90, 70, 25, "OK");
-	
-	fl_end_form();
-	
-	fl_show_form(f, FL_PLACE_MOUSE, FL_FULLBORDER, title);
-	
-	while(fl_do_forms() != obj)
-	
-	fl_finish();
-	exit(-1);
+    FL_FORM *f;
+    FL_OBJECT *obj;
+    
+    f = fl_bgn_form(FL_UP_BOX, 400*SCALE, 130*SCALE);
+    msg = fl_add_box(FL_NO_BOX, 0, 0, 400*SCALE, 90*SCALE, str);
+    obj = fl_add_button(FL_NORMAL_BUTTON, 115*SCALE, 90*SCALE, 70*SCALE, 25*SCALE, "OK");
+
+    fl_set_object_lsize(msg, 12*SCALE);  // tamaño de letra escalado
+    fl_set_object_lsize(obj, 10*SCALE);
+
+    fl_end_form();
+    fl_show_form(f, FL_PLACE_MOUSE, FL_FULLBORDER, title);
+
+    while(fl_do_forms() != obj);
+
+    fl_finish();
+    exit(-1);
 }
 	
 int set_temp_threshold(uint8_t temperature)
