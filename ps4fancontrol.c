@@ -50,6 +50,16 @@ int file_exist(const char *filename)
 	return 0;
 }
 
+int make_config_world_writable(const char *file)
+{
+    // 0666 = lectura/escritura para todos
+    if (chmod(file, 0666) != 0) {
+        perror("Failed to set permissions on config file");
+        return -1;
+    }
+    return 0;
+}
+
 int initSettings()
 {
 	if (geteuid() == 0) { // si se ejecuta como root
@@ -154,16 +164,6 @@ void showError(const char *title, const char *str)
 	
 	fl_finish();
 	exit(-1);
-}
-
-void make_config_world_writable(const char *file)
-{
-    // 0666 = lectura/escritura para todos
-    if (chmod(file, 0666) != 0) {
-        perror("Failed to set permissions on config file");
-        return -1;
-    }
-    return 0;
 }
 	
 int set_temp_threshold(uint8_t temperature)
