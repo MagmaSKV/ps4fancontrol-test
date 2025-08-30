@@ -151,6 +151,7 @@ void showError(const char *title, const char *str)
 {
     FL_FORM *f;
     FL_OBJECT *obj;
+    FL_OBJECT *msg;
     
     f = fl_bgn_form(FL_UP_BOX, 400*SCALE, 130*SCALE);
     msg = fl_add_box(FL_NO_BOX, 0, 0, 400*SCALE, 90*SCALE, str);
