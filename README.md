@@ -35,16 +35,15 @@ Select your favorite threshold temperature, save and exit.
 The selected temperature will be saved in a config file and loaded when ps4fancontrol starts.
 If you want load automatically ps4fancontrol at boot of your distro just put
 ```
-ps4fancontrol --no-gui
-```
-in a unit configuration file: https://wiki.archlinux.org/index.php/Systemd#Writing_unit_files or use crontab or similar...
-
-Or
-```
 sudo mv service/ps4fancontrol.service /etc/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable ps4fancontrol
 ```
+Or
+```
+ps4fancontrol --no-gui
+```
+in a unit configuration file: https://wiki.archlinux.org/index.php/Systemd#Writing_unit_files or use crontab or similar...
 
 ## Kudos
 Thanks to Zer0xFF for finding the right icc cmd to change the threshold temperature
