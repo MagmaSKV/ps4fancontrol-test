@@ -52,6 +52,10 @@ int file_exist(const char *filename)
 
 int initSettings()
 {
+	if (geteuid() == 0) { // si se ejecuta como root
+	    make_config_world_writable(configFile);
+	}
+
 	DIR *dir = opendir(CONFIG_DIR);
 	if(dir == NULL)
 	{
@@ -61,12 +65,14 @@ int initSettings()
 			if(mkdir(CONFIG_DIR, 0755))
 			{
 				perror("Error creating config directory");
+				printf("If you get a permission denied error, open as root/using sudo once and try again without root/sudo\n");
 				return -1;
 			}
 		}
 		else
 		{
 			perror("Error opening config directory");
+			printf("If you get a permission denied error, open as root/using sudo once and try again without root/sudo\n");
 			return -1;
 		}
 	}
@@ -84,6 +90,7 @@ int saveConfig(uint8_t temperature)
 	if(f == NULL)
 	{
 		perror("Error opening config file for writing");
+		printf("If you get a permission denied error, open as root/using sudo once and try again without root/sudo\n");
 		return -1;
 	}
 	if(fwrite(&temperature, 1, 1, f) != 1)
@@ -148,8 +155,17 @@ void showError(const char *title, const char *str)
 	fl_finish();
 	exit(-1);
 }
-	
 
+int make_config_world_writable(const char *file)
+{
+    // 0666 = lectura/escritura para todos
+    if (chmod(file, 0666) != 0) {
+        perror("Failed to set permissions on config file");
+        return -1;
+    }
+    return 0;
+}
+	
 int set_temp_threshold(uint8_t temperature)
 {
 	int fd = -1;
@@ -406,9 +422,9 @@ int main(int argc, char *argv[])
 	if(fd == -1)
 	{
 		if(no_gui)
-			showError("Error", "You need run the program as root!");
+			showError("Error", "You need run the program as root/using sudo once!");
 		else
-			printf("Error: you need run the program as root!");
+			printf("Error: you need run the program as root/using sudo once!");
 			
 		return -1;
 	}
